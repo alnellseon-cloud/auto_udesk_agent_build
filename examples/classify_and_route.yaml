@@ -1,0 +1,52 @@
+# 示例：分类路由工作流（问题分类 → 两条分支路径）
+name: "分类路由客服"
+description: "先分类问题类型，再走不同处理路径"
+
+nodes:
+  - id: start
+    type: start
+
+  - id: classifier
+    type: question_classifier
+    title: "问题分类"
+    instruction: "根据用户问题判断属于哪个类别"
+    model: doubao-seed-1.6
+    classes:
+      - id: "1"
+        name: "产品咨询"
+        description: "关于产品功能、价格、规格的问题"
+      - id: "2"
+        name: "售后服务"
+        description: "关于退换货、维修、投诉的问题"
+
+  # 产品咨询分支
+  - id: llm_product
+    type: llm
+    title: "产品咨询回答"
+    system_prompt: "你是产品专家，专注解答产品相关问题。"
+    model: doubao-seed-1.6
+
+  # 售后服务分支
+  - id: llm_service
+    type: llm
+    title: "售后服务回答"
+    system_prompt: "你是售后客服，专注处理退换货和投诉问题。"
+    model: doubao-seed-1.6
+
+  - id: ans
+    type: answer
+    answer: "{{#llm_product.text#}}{{#llm_service.text#}}"
+
+edges:
+  - from: start
+    to: classifier
+  - from: classifier
+    from_handle: "1"    # 产品咨询 → llm_product
+    to: llm_product
+  - from: classifier
+    from_handle: "2"    # 售后服务 → llm_service
+    to: llm_service
+  - from: llm_product
+    to: ans
+  - from: llm_service
+    to: ans

@@ -1,0 +1,48 @@
+# 示例：知识库客服工作流（开始 → 知识库检索 → 大模型 → 回答）
+name: "知识库客服机器人"
+description: "先检索知识库，再用大模型结合检索结果回答"
+
+nodes:
+  - id: start
+    type: start
+
+  - id: kb
+    type: knowledge_tool
+    title: "知识库检索"
+    knowledge_ids: []          # 在本地填写当前环境的知识库数字 ID
+    query_from: [sys, query]
+    top_k: 6
+
+  - id: rag1
+    type: rag_convert
+    title: "分片截断与格式化"
+    input_node: kb
+    docs_length: 10
+    limit_token: 15000
+
+  - id: llm1
+    type: llm
+    title: "大模型整合回答"
+    system_prompt: |
+      你是专业的客服助手。请仅根据知识库上下文回答用户问题。
+      如果知识库中没有相关信息，请如实告知用户。
+
+      知识库内容：
+      {{#context#}}
+    model: doubao-seed-1.6
+    memory_enabled: true
+    context_from: [rag1, text]
+
+  - id: ans
+    type: answer
+    answer: "{{#llm1.text#}}"
+
+edges:
+  - from: start
+    to: kb
+  - from: kb
+    to: rag1
+  - from: rag1
+    to: llm1
+  - from: llm1
+    to: ans

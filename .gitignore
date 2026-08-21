@@ -1,0 +1,48 @@
+# 环境配置（含 Token，绝不提交）
+.env
+.env.*
+!.env.example
+
+# Python 缓存
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# 虚拟环境
+.venv/
+venv/
+env/
+
+# 工作流临时快照（调试用，不需要纳入版本控制）
+current_workflow.json
+
+# 诊断输出文件
+tasks/**/inspect_result.txt
+tasks/**/code_nodes.txt
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
+
+# 本机 Agent 配置和记忆，不随项目发布
+.agents/
+.claude/
+
+# 客户任务默认仅保存在本地；只发布任务说明和通用模板
+tasks/*
+!tasks/README.md
+!tasks/_template/
+!tasks/_template/**
+tasks/_template/**/.DS_Store
+
+# 过程文件与交付物
+work/
+process/
+scratch/
+outputs/
+*.log

@@ -1,0 +1,25 @@
+# 示例：简单问答工作流（开始 → 大模型 → 回答）
+name: "简单问答机器人"
+description: "直接用大模型回答用户问题"
+
+nodes:
+  - id: start
+    type: start
+
+  - id: llm1
+    type: llm
+    title: "大模型回答"
+    system_prompt: "你是一个友好的 AI 助手，请简洁准确地回答用户的问题。"
+    model: doubao-seed-1.6
+    memory_enabled: true
+    memory_size: 10
+
+  - id: ans
+    type: answer
+    answer: "{{#llm1.text#}}"
+
+edges:
+  - from: start
+    to: llm1
+  - from: llm1
+    to: ans
